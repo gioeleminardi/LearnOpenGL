@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <assimp/Importer.hpp>
 
-const unsigned int WIDTH = 800;
-const unsigned int HEIGHT = 600;
+const unsigned int WIDTH = 1920;
+const unsigned int HEIGHT = 1080;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -33,13 +33,18 @@ int main() {
     glViewport(0, 0, WIDTH, HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // vsync
+    glfwSwapInterval(1);
+
     /// Shaders
     // Vertex Shader
     const char *vertexShaderSource = "#version 330 core\n"
                                      "layout (location = 0) in vec3 aPos;\n"
+                                     "out vec3 vertexColor;"
                                      "void main()\n"
                                      "{\n"
                                      "  gl_Position = vec4(aPos, 1.0);\n"
+                                     "  vertexColor = aPos;"
                                      "}\n";
 
     unsigned int vertexShader;
@@ -56,10 +61,14 @@ int main() {
 
     // Fragment Shader
     const char *fragmentShaderSource = "#version 330 core\n"
+                                       "in vec3 vertexColor;"
                                        "out vec4 FragColor;\n"
+                                       "uniform vec4 ourColor;\n"
                                        "void main()\n"
                                        "{\n"
-                                       "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                       "    //FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                       "    //FragColor = vec4(vertexColor, 1.0f);\n"
+                                       "    FragColor = ourColor;\n"
                                        "}\n";
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -80,7 +89,7 @@ int main() {
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "ERROR::SHADER_PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
+        std::cerr << "ERROR::SHADER::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
     }
 
     glDeleteShader(vertexShader);
@@ -128,7 +137,30 @@ int main() {
     // wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // delta time
+    auto currentTime = (float) glfwGetTime();
+    float deltaTime = 0.0f;
+    float lastTime = 0.0f;
+    int frameSamplesNum = 100;
+    int frames = 0;
+    float fpsAvg = 0.0f;
+
     while (!glfwWindowShouldClose(window)) {
+        currentTime = (float) glfwGetTime();
+        deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        if (frames++ < frameSamplesNum) {
+            fpsAvg += (1 / deltaTime);
+        }
+        if(frames == frameSamplesNum) {
+            fpsAvg /= frames;
+            std::cout << "FPS: " << fpsAvg << std::endl;
+            fpsAvg = 0.0f;
+            frames = 0;
+        }
+
+
         // input
         process_input(window);
 
@@ -136,17 +168,25 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // setting uniforms in shader
+        auto timeValue = (float) glfwGetTime();
+        float greenValue = ((float) sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+
         glUseProgram(shaderProgram);
         {
+            glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
             glBindVertexArray(VAO);
             {
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
             }
         }
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
+
     }
 
     glfwTerminate();
