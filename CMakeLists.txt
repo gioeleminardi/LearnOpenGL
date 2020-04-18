@@ -12,8 +12,9 @@ include_directories("C:/Users/gioel/Documents/Visual Studio 2019/External Libs/a
 link_directories("C:/Users/gioel/Documents/Visual Studio 2019/External Libs/glfw-3.3.2.bin.WIN64/lib-vc2019")
 link_directories("C:/Users/gioel/Documents/Visual Studio 2019/External Libs/assimp-5.0.1/lib/Release")
 
+file(GLOB_RECURSE headers include/*.hpp)
 file(GLOB_RECURSE sources src/*.cpp)
 
-add_executable(LearnOpenGLcom src/glad.c ${sources})
+add_executable(LearnOpenGLcom ${headers} ${sources} src/glad.c)
 
 target_link_libraries(LearnOpenGLcom opengl32 glfw3 assimp-vc142-mt)
