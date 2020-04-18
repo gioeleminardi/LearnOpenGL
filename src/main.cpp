@@ -40,11 +40,12 @@ int main() {
     // Vertex Shader
     const char *vertexShaderSource = "#version 330 core\n"
                                      "layout (location = 0) in vec3 aPos;\n"
+                                     "layout (location = 1) in vec3 aColor;\n"
                                      "out vec3 vertexColor;"
                                      "void main()\n"
                                      "{\n"
                                      "  gl_Position = vec4(aPos, 1.0);\n"
-                                     "  vertexColor = aPos;"
+                                     "  vertexColor = aColor;"
                                      "}\n";
 
     unsigned int vertexShader;
@@ -68,7 +69,7 @@ int main() {
                                        "{\n"
                                        "    //FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                                        "    //FragColor = vec4(vertexColor, 1.0f);\n"
-                                       "    FragColor = ourColor;\n"
+                                       "    FragColor = vec4(vertexColor, 1.0f);\n"
                                        "}\n";
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -97,10 +98,10 @@ int main() {
 
     // mesh
     float vertices[] = {
-            0.5f, 0.5f, 0.0f,   //TR
-            0.5f, -0.5f, 0.0f,  //BR
-            -0.5f, -0.5f, 0.0f, //BL
-            -0.5f, 0.5f, 0.0f,  //TL
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, //TR
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, //BR
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,//BL
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f //TL
     };
 
     unsigned int indices[] = {
@@ -122,8 +123,12 @@ int main() {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         {
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
             glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+            glEnableVertexAttribArray(1);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
             {
@@ -153,8 +158,8 @@ int main() {
         if (frames++ < frameSamplesNum) {
             fpsAvg += (1 / deltaTime);
         }
-        if(frames == frameSamplesNum) {
-            fpsAvg /= frames;
+        if (frames == frameSamplesNum) {
+            fpsAvg /= (float) frames;
             std::cout << "FPS: " << fpsAvg << std::endl;
             fpsAvg = 0.0f;
             frames = 0;
