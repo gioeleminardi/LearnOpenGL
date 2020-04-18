@@ -118,8 +118,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // setting uniforms in shader
-        auto timeValue = (float) glfwGetTime();
-        float greenValue = ((float) sin(timeValue) / 2.0f) + 0.5f;
+        float greenValue = ((float) sin(currentTime * 4) / 2.0f) + 0.5f;
 
         ourShader.use();
         {
