@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <assimp/Importer.hpp>
 
-const unsigned int WIDTH = 1920;
-const unsigned int HEIGHT = 1080;
+const unsigned int WIDTH = 800;
+const unsigned int HEIGHT = 600;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -88,9 +88,15 @@ int main() {
 
     // mesh
     float vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f
+            0.5f, 0.5f, 0.0f,   //TR
+            0.5f, -0.5f, 0.0f,  //BR
+            -0.5f, -0.5f, 0.0f, //BL
+            -0.5f, 0.5f, 0.0f,  //TL
+    };
+
+    unsigned int indices[] = {
+            0, 1, 3,
+            1, 2, 3
     };
 
     unsigned int VAO;
@@ -99,6 +105,9 @@ int main() {
     unsigned int VBO;
     glGenBuffers(1, &VBO);
 
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+
     glBindVertexArray(VAO);
     {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -106,10 +115,18 @@ int main() {
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
             glEnableVertexAttribArray(0);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            {
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+            }
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     glBindVertexArray(0);
+
+    // wireframe
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while (!glfwWindowShouldClose(window)) {
         // input
@@ -123,7 +140,7 @@ int main() {
         {
             glBindVertexArray(VAO);
             {
-                glDrawArrays(GL_TRIANGLES, 0, 3);
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             }
         }
 
