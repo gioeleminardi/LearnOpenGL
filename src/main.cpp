@@ -18,7 +18,7 @@ glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
-void process_input(GLFWwindow *window);
+void process_input(GLFWwindow *window, const float &deltaTime);
 
 unsigned int load_texture(const char *filename);
 
@@ -53,15 +53,6 @@ int main() {
 
     // Shader
     Shader ourShader("../shaders/shader.vert", "../shaders/shader.frag");
-
-    // mesh
-//    float vertices[] = {
-//             // x    y    z          u     v
-//             0.5f,  0.5f, 0.0f,    1.0f, 1.0f, //TR
-//             0.5f, -0.5f, 0.0f,    1.0f, 0.0f, //BR
-//            -0.5f, -0.5f, 0.0f,    0.0f, 0.0f, //BL
-//            -0.5f,  0.5f, 0.0f,    0.0f, 1.0f  //TL
-//    };
 
     float vertices[] = {
             -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
@@ -177,7 +168,7 @@ int main() {
         }
 
         // input
-        process_input(window);
+        process_input(window, deltaTime);
 
         // rendering commands
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -189,8 +180,7 @@ int main() {
         float camZ = cos(glfwGetTime()) * radius;
         glm::vec3 offsetZ(0.0f, 0.0f, -5.0f);
         glm::mat4 view(1.0f);
-        view = glm::lookAt(glm::vec3(camX, 0.0f, camZ) + offsetZ, glm::vec3(0.0f, 0.0f, 0.0) + offsetZ,
-                           glm::vec3(0.0f, 1.0f, 0.0f));
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         // clip space
         glm::mat4 projection(1.0f);
@@ -249,10 +239,19 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
  * Called every frame for processing input queue
  * @param window
  */
-void process_input(GLFWwindow *window) {
+void process_input(GLFWwindow *window, const float &deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+    const float cameraSpeed = 15 * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 unsigned int load_texture(const char *filename) {
