@@ -86,13 +86,12 @@ int main() {
     // wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // delta time
-    auto currentTime = (float) glfwGetTime();
-    float deltaTime = 0.0f;
-    float lastTime = 0.0f;
+    float currentTime;
+    float deltaTime;
+    float lastTime{};
+    float fpsAvg{};
     int frameSamplesNum = 100;
-    int frames = 0;
-    float fpsAvg = 0.0f;
+    int frames{};
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
