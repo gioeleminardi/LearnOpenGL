@@ -4,13 +4,16 @@
 #include <GLFW/glfw3.h>
 #include <assimp/Importer.hpp>
 #include <Shader.hpp>
+#include "stb_image.hpp"
 
-const unsigned int WIDTH = 1920;
-const unsigned int HEIGHT = 1080;
+const unsigned int WIDTH = 1600;
+const unsigned int HEIGHT = 1200;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void process_input(GLFWwindow *window);
+
+unsigned int load_texture();
 
 int main() {
     glfwInit();
@@ -42,10 +45,10 @@ int main() {
 
     // mesh
     float vertices[] = {
-            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, //TR
-            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, //BR
-            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,//BL
-            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f //TL
+             0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,    1.0f, 1.0f, //TR
+             0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,    1.0f, 0.0f, //BR
+            -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,    0.0f, 0.0f, //BL
+            -0.5f,  0.5f, 0.0f,     1.0f, 1.0f, 1.0f,    0.0f, 1.0f  //TL
     };
 
     unsigned int indices[] = {
@@ -68,11 +71,14 @@ int main() {
         {
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
             glEnableVertexAttribArray(0);
 
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
             glEnableVertexAttribArray(1);
+
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+            glEnableVertexAttribArray(2);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
             {
@@ -85,6 +91,10 @@ int main() {
 
     // wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+    // generate texture
+    unsigned int texture = load_texture();
 
     float currentTime;
     float deltaTime;
@@ -108,7 +118,6 @@ int main() {
             frames = 0;
         }
 
-
         // input
         process_input(window);
 
@@ -122,6 +131,9 @@ int main() {
         ourShader.use();
         {
             ourShader.setFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture);
 
             glBindVertexArray(VAO);
             {
@@ -158,3 +170,44 @@ void process_input(GLFWwindow *window) {
         glfwSetWindowShouldClose(window, true);
     }
 }
+
+unsigned int load_texture() {
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *textureData = stbi_load("../textures/container.jpg", &width, &height, &nrChannels, 0);
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (textureData) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        } else {
+            std::cerr << "Error loading texture\n";
+        }
+    }
+    stbi_image_free(textureData);
+    return texture;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
