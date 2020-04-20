@@ -12,6 +12,10 @@
 const unsigned int WIDTH = 1600;
 const unsigned int HEIGHT = 1200;
 
+glm::vec3 cameraPos(0.0f, 0.0f, 4.0f);
+glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void process_input(GLFWwindow *window);
@@ -179,11 +183,14 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
         // camera space
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        glm::vec3 offsetZ(0.0f, 0.0f, -5.0f);
         glm::mat4 view(1.0f);
-        view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        view = glm::lookAt(glm::vec3(camX, 0.0f, camZ) + offsetZ, glm::vec3(0.0f, 0.0f, 0.0) + offsetZ,
+                           glm::vec3(0.0f, 1.0f, 0.0f));
 
         // clip space
         glm::mat4 projection(1.0f);
@@ -206,7 +213,8 @@ int main() {
                 for (unsigned int i = 0; i < sizeof(cubePositions) / sizeof(glm::vec3); ++i) {
                     glm::mat4 model(1.0f);
                     model = glm::translate(model, cubePositions[i]);
-                    model = glm::rotate(model, (float) glfwGetTime() * glm::radians(20.0f * i+10), glm::vec3(0.5f, 1.0f, 0.0f));
+                    model = glm::rotate(model, (float) glfwGetTime() * glm::radians(20.0f * i + 10),
+                                        glm::vec3(0.5f, 1.0f, 0.0f));
                     ourShader.setMat4("model", model);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
