@@ -2,8 +2,11 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <assimp/Importer.hpp>
-#include <Shader.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Shader.hpp"
 #include "stb_image.hpp"
 
 const unsigned int WIDTH = 1600;
@@ -14,9 +17,18 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void process_input(GLFWwindow *window);
 
 unsigned int load_texture(const char *filename);
+
 unsigned int load_textureA(const char *filename);
 
 int main() {
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::mat4 trans(1.0f);
+    //trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+    vec = trans * vec;
+    std::cout << vec.x << " " << vec.y << " " << vec.z << "\n";
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -129,11 +141,15 @@ int main() {
         // setting uniforms in shader
         float greenValue = ((float) sin(currentTime * 4) / 2.0f) + 0.5f;
 
+        glm::mat4 transform(1.0f);
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
         ourShader.use();
         {
             ourShader.setInt("texture1", 0);
             ourShader.setInt("texture2", 1);
-            ourShader.setFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+            ourShader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+            ourShader.setMat4("transform", transform);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture1);
