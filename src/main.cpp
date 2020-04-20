@@ -141,15 +141,15 @@ int main() {
         // setting uniforms in shader
         float greenValue = ((float) sin(currentTime * 4) / 2.0f) + 0.5f;
 
-        glm::mat4 transform(1.0f);
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 model(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
         ourShader.use();
         {
             ourShader.setInt("texture1", 0);
             ourShader.setInt("texture2", 1);
             ourShader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
-            ourShader.setMat4("transform", transform);
+            ourShader.setMat4("model", model);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture1);
