@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <sstream>
 
 #include "Shader.hpp"
 #include "stb_image.hpp"
@@ -15,10 +16,23 @@ const unsigned int HEIGHT = 1200;
 glm::vec3 cameraPos(0.0f, 0.0f, 4.0f);
 glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+const std::string AppName{"LearnOpenGL"};
+
+float mouseSensitivity{0.1f};
+float yaw{-90.0f};
+float pitch{0.0f};
+float fov{45.0f};
+bool firstMouse{true};
+float lastX{(float) WIDTH / 2};
+float lastY{(float) HEIGHT / 2};
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void process_input(GLFWwindow *window, const float &deltaTime);
+
+void mouse_callback(GLFWwindow *window, double xPos, double yPos);
+
+void scroll_callback(GLFWwindow *window, double xOffset, double yOffset);
 
 unsigned int load_texture(const char *filename);
 
@@ -30,7 +44,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, AppName.c_str(), nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
@@ -45,6 +59,9 @@ int main() {
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth test
     glEnable(GL_DEPTH_TEST);
@@ -151,6 +168,7 @@ int main() {
     float fpsAvg{};
     int frameSamplesNum = 50;
     int frames{};
+    std::stringstream ss_fps;
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
@@ -161,8 +179,11 @@ int main() {
             fpsAvg += (1 / deltaTime);
         }
         if (frames == frameSamplesNum) {
+            ss_fps.str(std::string());
             fpsAvg /= (float) frames;
-            std::cout << "FPS: " << fpsAvg << std::endl;
+            ss_fps << AppName << " - ";
+            ss_fps << fpsAvg << " fps";
+            glfwSetWindowTitle(window, ss_fps.str().c_str());
             fpsAvg = 0.0f;
             frames = 0;
         }
@@ -174,17 +195,12 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // camera space
-        const float radius = 10.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
-        glm::vec3 offsetZ(0.0f, 0.0f, -5.0f);
         glm::mat4 view(1.0f);
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         // clip space
         glm::mat4 projection(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(fov), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
 
         ourShader.use();
         {
@@ -302,7 +318,52 @@ unsigned int load_textureA(const char *filename) {
     return texture;
 }
 
+void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
+    if (firstMouse) {
+        lastX = (float) xPos;
+        lastY = (float) yPos;
+        firstMouse = false;
+    }
+    float xOffset = (float) xPos - lastX;
+    float yOffset = lastY - (float) yPos;
 
+    lastX = (float) xPos;
+    lastY = (float) yPos;
+
+    xOffset *= mouseSensitivity;
+    yOffset *= mouseSensitivity;
+
+    yaw += xOffset;
+    pitch += yOffset;
+
+    if (pitch > 89.0f) {
+        pitch = 89.0f;
+    }
+    if (pitch < -89.0f) {
+        pitch = -89.0f;
+    }
+
+    glm::vec3 direction(1.0f);
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}
+
+
+void scroll_callback(GLFWwindow *window, double xOffset, double yOffset) {
+    if (fov >= 1.0f && fov <= 45.0f) {
+        fov -= (float) yOffset;
+    }
+    if (fov <= 1.0f) {
+        fov = 1.0f;
+    }
+    if (fov >= 45.0f) {
+        fov = 45.0f;
+    }
+
+    std::cout << "FOV: " << fov << std::endl;
+}
 
 
 
