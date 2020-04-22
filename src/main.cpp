@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -16,6 +20,7 @@ const unsigned int HEIGHT = 1200;
 
 const std::string AppName{"LearnOpenGL"};
 
+int display_w, display_h;
 float mouseSensitivity{0.1f};
 float yaw{-90.0f};
 float pitch{0.0f};
@@ -59,15 +64,28 @@ int main() {
     }
 
     glViewport(0, 0, WIDTH, HEIGHT);
+    glfwGetFramebufferSize(window, &display_w, &display_h);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth test
     glEnable(GL_DEPTH_TEST);
     // vsync
     glfwSwapInterval(1);
+
+    // GUI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    //(void) io;
+
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+
 
     // Shader
     Shader lightShader("../shaders/light.vert", "../shaders/light.frag");
@@ -165,6 +183,8 @@ int main() {
     int frameSamplesNum = 50;
     int frames{};
     std::stringstream ss_fps;
+    bool test_bool = false;
+    ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
@@ -184,18 +204,45 @@ int main() {
             frames = 0;
         }
 
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
+
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+            ImGui::Begin("Hello, World!");
+
+            ImGui::Text("This is a test text");
+            ImGui::Checkbox("Checkbox test", &test_bool);
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float *) &clear_color);
+            if (ImGui::Button("Button")) {
+                ++counter;
+            }
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+            ImGui::End();
+        }
+        // ImGUI
+        ImGui::Render();
+
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         // input
         process_input(window, deltaTime);
 
-        // rendering commands
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glm::mat4 projection = glm::perspective(glm::radians(mainCamera.getZoom()), (float) WIDTH / (float) HEIGHT,
+        glm::mat4 projection = glm::perspective(glm::radians(mainCamera.getZoom()), (float) display_w / (float) display_h,
                                                 0.1f, 100.0f);
         glm::mat4 view = mainCamera.getViewMatrix();
-
-
         glm::mat4 model = glm::mat4(1.0f);
 
         lightShader.use();
@@ -212,7 +259,6 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
-
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
@@ -239,6 +285,11 @@ int main() {
     glDeleteVertexArrays(1, &lightSourceVAO);
     glDeleteBuffers(1, &cubeVBO);
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+
     glfwTerminate();
 
     return 0;
@@ -252,6 +303,7 @@ int main() {
  */
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
+    glfwGetFramebufferSize(window, &display_w, &display_h);
 }
 
 /**
