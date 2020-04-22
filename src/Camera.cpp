@@ -77,4 +77,8 @@ float Camera::getZoom() const {
     return zoom_;
 }
 
+const glm::vec3 &Camera::getPosition() const {
+    return position_;
+}
+
 Camera::~Camera() = default;

@@ -39,6 +39,8 @@ public:
 
     float getZoom() const;
 
+    const glm::vec3 &getPosition() const;
+
 private:
     void updateCameraVectors();
 
