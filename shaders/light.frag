@@ -7,5 +7,8 @@ uniform vec3 objectColor;
 
 void main()
 {
-    FragColor = vec4(lightColor * objectColor, 1.0f);
+    float ambientStrenght = 0.1f;
+    vec3 ambient = ambientStrenght * lightColor;
+    vec3 result = ambient * objectColor;
+    FragColor = vec4(result, 1.0f);
 }
