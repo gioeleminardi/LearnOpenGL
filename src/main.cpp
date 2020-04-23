@@ -190,6 +190,7 @@ int main() {
 
     unsigned int diffuseMap = load_textureA("../textures/container2.png");
     unsigned int specularMap = load_textureA("../textures/container2_specular.png");
+    unsigned int emitMap = load_texture("../textures/matrix.jpg");
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
@@ -209,38 +210,8 @@ int main() {
             frames = 0;
         }
 
-        // Start the Dear ImGui frame
-//        ImGui_ImplOpenGL3_NewFrame();
-//        ImGui_ImplGlfw_NewFrame();
-//        ImGui::NewFrame();
-//
-//        ImGui::ShowDemoWindow();
-//
-//        {
-//            static float f = 0.0f;
-//            static int counter = 0;
-//            ImGui::Begin("Hello, World!");
-//
-//            ImGui::Text("This is a test text");
-//            ImGui::Checkbox("Checkbox test", &test_bool);
-//            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-//            ImGui::ColorEdit3("clear color", (float *) &clear_color);
-//            if (ImGui::Button("Button")) {
-//                ++counter;
-//            }
-//            ImGui::SameLine();
-//            ImGui::Text("counter = %d", counter);
-//
-//            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-//
-//            ImGui::End();
-//        }
-        // ImGUI
-//        ImGui::Render();
-
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // input
         process_input(window, deltaTime);
@@ -265,22 +236,27 @@ int main() {
 
         lightShader.setInt("material.diffuse", 0);
         lightShader.setInt("material.specular", 1);
+        lightShader.setInt("material.emission", 2);
         lightShader.setFloat("material.shininess", 32.0f);
 
-        lightShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        lightShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+        lightShader.setVec3("light.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+        lightShader.setVec3("light.diffuse", glm::vec3(0.6f, 0.6f, 0.6f));
         lightShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emitMap);
 
         glBindVertexArray(cubeVAO);
         {
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
+
+        glActiveTexture(0);
 
 
         model = glm::mat4(1.0f);
