@@ -68,7 +68,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // depth test
     glEnable(GL_DEPTH_TEST);
@@ -76,16 +76,14 @@ int main() {
     glfwSwapInterval(1);
 
     // GUI
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    //(void) io;
-
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
-
-
+//    IMGUI_CHECKVERSION();
+//    ImGui::CreateContext();
+//    ImGuiIO &io = ImGui::GetIO();
+//    //(void) io;
+//
+//    ImGui::StyleColorsDark();
+//    ImGui_ImplGlfw_InitForOpenGL(window, true);
+//    ImGui_ImplOpenGL3_Init("#version 130");
 
     // Shader
     Shader lightShader("../shaders/light.vert", "../shaders/light.frag");
@@ -184,7 +182,7 @@ int main() {
     int frames{};
     std::stringstream ss_fps;
     bool test_bool = false;
-    ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 clear_color(0.0f, 0.0f, 0.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
@@ -205,40 +203,44 @@ int main() {
         }
 
         // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::ShowDemoWindow();
-
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-            ImGui::Begin("Hello, World!");
-
-            ImGui::Text("This is a test text");
-            ImGui::Checkbox("Checkbox test", &test_bool);
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float *) &clear_color);
-            if (ImGui::Button("Button")) {
-                ++counter;
-            }
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-            ImGui::End();
-        }
+//        ImGui_ImplOpenGL3_NewFrame();
+//        ImGui_ImplGlfw_NewFrame();
+//        ImGui::NewFrame();
+//
+//        ImGui::ShowDemoWindow();
+//
+//        {
+//            static float f = 0.0f;
+//            static int counter = 0;
+//            ImGui::Begin("Hello, World!");
+//
+//            ImGui::Text("This is a test text");
+//            ImGui::Checkbox("Checkbox test", &test_bool);
+//            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+//            ImGui::ColorEdit3("clear color", (float *) &clear_color);
+//            if (ImGui::Button("Button")) {
+//                ++counter;
+//            }
+//            ImGui::SameLine();
+//            ImGui::Text("counter = %d", counter);
+//
+//            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+//
+//            ImGui::End();
+//        }
         // ImGUI
-        ImGui::Render();
+//        ImGui::Render();
 
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+//        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // input
         process_input(window, deltaTime);
+
+        glm::mat4 transform(1.0f);
+        float val = sin((float)glfwGetTime()*2)*2;
+        lightPos.z = val;
 
         glm::mat4 projection = glm::perspective(glm::radians(mainCamera.getZoom()), (float) display_w / (float) display_h,
                                                 0.1f, 100.0f);
@@ -285,10 +287,9 @@ int main() {
     glDeleteVertexArrays(1, &lightSourceVAO);
     glDeleteBuffers(1, &cubeVBO);
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
+//    ImGui_ImplOpenGL3_Shutdown();
+//    ImGui_ImplGlfw_Shutdown();
+//    ImGui::DestroyContext();
 
     glfwTerminate();
 
