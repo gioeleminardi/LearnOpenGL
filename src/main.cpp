@@ -239,22 +239,40 @@ int main() {
         process_input(window, deltaTime);
 
         glm::mat4 transform(1.0f);
-        float val = sin((float)glfwGetTime()*2)*2;
+        float val = sin((float) glfwGetTime() * 2) * 2;
         lightPos.z = val;
 
-        glm::mat4 projection = glm::perspective(glm::radians(mainCamera.getZoom()), (float) display_w / (float) display_h,
+        glm::mat4 projection = glm::perspective(glm::radians(mainCamera.getZoom()),
+                                                (float) display_w / (float) display_h,
                                                 0.1f, 100.0f);
         glm::mat4 view = mainCamera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
 
         lightShader.use();
         lightShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
         lightShader.setMat4("view", view);
         lightShader.setMat4("projection", projection);
         lightShader.setMat4("model", model);
         lightShader.setVec3("lightPos", lightPos);
         lightShader.setVec3("viewPos", mainCamera.getPosition());
+
+        lightShader.setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+        lightShader.setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        lightShader.setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        lightShader.setFloat("material.shininess", 32.0f);
+
+        glm::vec3 lightColor;
+        lightColor.x = sin((float) glfwGetTime() * 2.0f);
+        lightColor.y = sin((float) glfwGetTime() * 0.7f);
+        lightColor.z = sin((float) glfwGetTime() * 1.3f);
+
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+        lightShader.setVec3("light.ambient", ambientColor);
+        lightShader.setVec3("light.diffuse", diffuseColor);
+        lightShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
 
         glBindVertexArray(cubeVAO);
         {
