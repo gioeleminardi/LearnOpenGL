@@ -264,8 +264,8 @@ int main() {
         lightShader.setVec3("pLights_[0].base.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         lightShader.setVec3("pLights_[0].position", lightPos);
         lightShader.setFloat("pLights_[0].attenuation.constant", 1.0f);
-        lightShader.setFloat("pLights_[0].attenuation.linear", 0.09f);
-        lightShader.setFloat("pLights_[0].attenuation.quadratic", 0.032f);
+        lightShader.setFloat("pLights_[0].attenuation.linear", 0.045f);
+        lightShader.setFloat("pLights_[0].attenuation.quadratic", 0.0075f);
 
         // SpotLight
         // todo
@@ -292,7 +292,6 @@ int main() {
 
         glActiveTexture(0);
 
-
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f));
@@ -316,10 +315,6 @@ int main() {
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteVertexArrays(1, &lightSourceVAO);
     glDeleteBuffers(1, &cubeVBO);
-
-//    ImGui_ImplOpenGL3_Shutdown();
-//    ImGui_ImplGlfw_Shutdown();
-//    ImGui::DestroyContext();
 
     glfwTerminate();
 
