@@ -252,14 +252,20 @@ int main() {
         lightShader.setInt("material.emission", 2);
         lightShader.setFloat("material.shininess", 32.0f);
 
-        // PointLight
-        lightShader.setVec3("pLight.base.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
-        lightShader.setVec3("pLight.base.diffuse", glm::vec3(0.6f, 0.6f, 0.6f));
-        lightShader.setVec3("pLight.base.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setVec3("pLight.position", lightPos);
-
         // DirectionalLight
-        // todo
+        lightShader.setVec3("dLight_.base.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+        lightShader.setVec3("dLight_.base.diffuse", glm::vec3(0.7f, 0.7f, 0.7f));
+        lightShader.setVec3("dLight_.base.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        lightShader.setVec3("dLight_.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+
+        // PointLights
+        lightShader.setVec3("pLights_[0].base.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+        lightShader.setVec3("pLights_[0].base.diffuse", glm::vec3(0.6f, 0.6f, 0.6f));
+        lightShader.setVec3("pLights_[0].base.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        lightShader.setVec3("pLights_[0].position", lightPos);
+        lightShader.setFloat("pLights_[0].attenuation.constant", 1.0f);
+        lightShader.setFloat("pLights_[0].attenuation.linear", 0.09f);
+        lightShader.setFloat("pLights_[0].attenuation.quadratic", 0.032f);
 
         // SpotLight
         // todo
