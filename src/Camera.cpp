@@ -81,4 +81,8 @@ const glm::vec3 &Camera::getPosition() const {
     return position_;
 }
 
+const glm::vec3 &Camera::getFront() const {
+    return front_;
+}
+
 Camera::~Camera() = default;

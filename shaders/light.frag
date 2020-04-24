@@ -47,14 +47,15 @@ struct SpotLight {
     float outerCutOff;
 };
 
-#define NUM_POINTLIGHTS 10
-#define NUM_SPOTLIGHTS 10
+#define NUM_POINTLIGHTS 4
+#define NUM_SPOTLIGHTS 4
 
 uniform vec3 viewPos;
 
 uniform DirectionalLight dLight_;
 uniform PointLight pLights_[NUM_POINTLIGHTS];
 uniform SpotLight sLights_[NUM_SPOTLIGHTS];
+uniform SpotLight flashLight;
 
 uniform Material material;
 
@@ -105,8 +106,21 @@ vec3 calculatePointLight(PointLight pLight, vec3 viewDirection, vec3 normal) {
 }
 
 vec3 calculateSpotLight(SpotLight sLight, vec3 viewDirection, vec3 normal) {
+    vec3 fragToLightVector = sLight.position - FragPos;
+    vec3 lightDirection = normalize(fragToLightVector);
 
-    return vec3(0, 0, 0);
+    vec3 ambient = calculateAmbientLight(sLight.base);
+    vec3 diffuse = calculateDiffuseLight(sLight.base, lightDirection, normal);
+    vec3 specular = calculateSpecularLight(sLight.base, lightDirection, viewDirection, normal);
+
+    float distance = length(fragToLightVector);
+    float attenuation = calculateAttenuation(sLight.attenuation, distance);
+
+    float theta = dot(lightDirection, normalize(-sLight.direction));
+    float epsilon = sLight.cutOff - sLight.outerCutOff;
+    float intensity = clamp((theta - sLight.outerCutOff) / epsilon, 0.0f, 1.0f);
+
+    return (ambient + diffuse + specular) * attenuation * intensity;
 }
 
 void main()
@@ -115,7 +129,7 @@ void main()
     vec3 viewDirection = normalize(viewPos - FragPos);
 
     vec3 result = calculateDirectionalLight(dLight_, viewDirection, normal);
-    //vec3 result;
+//    vec3 result;
 
     for (int i = 0; i < NUM_POINTLIGHTS; ++i){
         result += calculatePointLight(pLights_[i], viewDirection, normal);
@@ -125,10 +139,10 @@ void main()
         result += calculateSpotLight(sLights_[i], viewDirection, normal);
     }
 
-    // emission
-    vec3 emission = texture(material.emission, TexCoords).rgb;
+    result += calculateSpotLight(flashLight, viewDirection, normal);
 
-    //vec3 result = ambient + diffuse + specular;// + emission;
+    // emission
+    // vec3 emission = texture(material.emission, TexCoords).rgb;
 
     FragColor = vec4(result, 1.0f);
 }
