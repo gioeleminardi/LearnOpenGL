@@ -117,9 +117,20 @@ int main() {
                                                 (float) display_w / (float) display_h,
                                                 0.1f, 100.0f);
         glm::mat4 view = mainCamera.getViewMatrix();
+
+        modelLoadingShader.use();
+        modelLoadingShader.setMat4("projection", projection);
+        modelLoadingShader.setMat4("view", view);
+
+
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.2f));
 
 
+        modelLoadingShader.setMat4("model", model);
+
+        nanosuit.Draw(modelLoadingShader);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
