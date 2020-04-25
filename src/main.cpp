@@ -73,7 +73,7 @@ int main() {
     glfwSwapInterval(1);
 
     // Model
-    Model nanosuit("../models/nanosuit/nanosuit.obj");
+    //Model nanosuit("../models/nanosuit/nanosuit.obj");
     Model sponza("../models/sponza/sponza.obj");
     // Shader
     Shader modelLoadingShader("../shaders/model_loading.vert", "../shaders/model_loading.frag");
