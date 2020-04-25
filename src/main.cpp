@@ -88,6 +88,8 @@ int main() {
     int frames{};
     std::stringstream ss_fps;
     glm::vec4 clear_color(0.0f, 0.0f, 0.0f, 1.0f);
+    float modelAngle = 0.0f;
+    float rotatingSpeed = 40.0f;
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
@@ -125,6 +127,9 @@ int main() {
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+        modelAngle += rotatingSpeed * deltaTime;
+        modelAngle = glm::mod(modelAngle, 360.0f);
+        model = glm::rotate(model, glm::radians(modelAngle), glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.2f));
 
 
