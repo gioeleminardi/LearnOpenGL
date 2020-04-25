@@ -129,7 +129,6 @@ void main()
     vec3 viewDirection = normalize(viewPos - FragPos);
 
     vec3 result = calculateDirectionalLight(dLight_, viewDirection, normal);
-//    vec3 result;
 
     for (int i = 0; i < NUM_POINTLIGHTS; ++i){
         result += calculatePointLight(pLights_[i], viewDirection, normal);
@@ -140,9 +139,6 @@ void main()
     }
 
     result += calculateSpotLight(flashLight, viewDirection, normal);
-
-    // emission
-    // vec3 emission = texture(material.emission, TexCoords).rgb;
 
     FragColor = vec4(result, 1.0f);
 }

@@ -78,7 +78,7 @@ int main() {
     Shader modelLoadingShader("../shaders/model_loading.vert", "../shaders/model_loading.frag");
 
     // wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     float currentTime;
     float deltaTime;
@@ -124,6 +124,21 @@ int main() {
         modelLoadingShader.setMat4("projection", projection);
         modelLoadingShader.setMat4("view", view);
 
+        modelLoadingShader.setVec3("viewPos", mainCamera.getPosition());
+        modelLoadingShader.setFloat("material.shininess", 32.0f);
+
+        modelLoadingShader.setVec3("dLight_.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        modelLoadingShader.setVec3("dLight_.base.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+        modelLoadingShader.setVec3("dLight_.base.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+        modelLoadingShader.setVec3("dLight_.base.specular", glm::vec3(0.8f, 0.8f, 0.8f));
+
+        modelLoadingShader.setVec3("pLights_[0].position", glm::vec3(0.7f, 0.2f, 2.0f));
+        modelLoadingShader.setVec3("pLights_[0].base.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+        modelLoadingShader.setVec3("pLights_[0].base.diffuse", glm::vec3(0.7f, 0.7f, 0.7f));
+        modelLoadingShader.setVec3("pLights_[0].base.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        modelLoadingShader.setFloat("pLights_[0].attenuation.constant", 1.0f);
+        modelLoadingShader.setFloat("pLights_[0].attenuation.linear", 0.09f);
+        modelLoadingShader.setFloat("pLights_[0].attenuation.quadratic", 0.032f);
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
@@ -131,7 +146,6 @@ int main() {
         modelAngle = glm::mod(modelAngle, 360.0f);
         model = glm::rotate(model, glm::radians(modelAngle), glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.2f));
-
 
         modelLoadingShader.setMat4("model", model);
 
