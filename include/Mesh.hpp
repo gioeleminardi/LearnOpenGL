@@ -13,12 +13,13 @@
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
-    glm::vec3 texCoords;
+    glm::vec2 texCoords;
 };
 
 struct Texture {
     unsigned int id;
     std::string type;
+    std::string path;
 };
 
 class Mesh {
@@ -27,7 +28,7 @@ public:
 
     virtual ~Mesh();
 
-    void Draw(const Shader &shader);
+    void Draw(const Shader &shader) const;
 
 private:
     unsigned int VAO, VBO, EBO;
