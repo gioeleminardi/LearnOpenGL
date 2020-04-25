@@ -74,6 +74,7 @@ int main() {
 
     // Model
     Model nanosuit("../models/nanosuit/nanosuit.obj");
+    Model sponza("../models/sponza/sponza.obj");
     // Shader
     Shader modelLoadingShader("../shaders/model_loading.vert", "../shaders/model_loading.frag");
 
@@ -88,8 +89,8 @@ int main() {
     int frames{};
     std::stringstream ss_fps;
     glm::vec4 clear_color(0.0f, 0.0f, 0.0f, 1.0f);
-    float modelAngle = 0.0f;
-    float rotatingSpeed = 40.0f;
+    //float modelAngle = 0.0f;
+    //float rotatingSpeed = 40.0f;
 
     while (!glfwWindowShouldClose(window)) {
         currentTime = (float) glfwGetTime();
@@ -117,7 +118,7 @@ int main() {
 
         glm::mat4 projection = glm::perspective(glm::radians(mainCamera.getZoom()),
                                                 (float) display_w / (float) display_h,
-                                                0.1f, 100.0f);
+                                                0.1f, 1000.0f);
         glm::mat4 view = mainCamera.getViewMatrix();
 
         modelLoadingShader.use();
@@ -141,15 +142,16 @@ int main() {
         modelLoadingShader.setFloat("pLights_[0].attenuation.quadratic", 0.032f);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-        modelAngle += rotatingSpeed * deltaTime;
-        modelAngle = glm::mod(modelAngle, 360.0f);
-        model = glm::rotate(model, glm::radians(modelAngle), glm::vec3(0.0f, -1.0f, 0.0f));
+        //model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+        //modelAngle += rotatingSpeed * deltaTime;
+        //modelAngle = glm::mod(modelAngle, 360.0f);
+        //model = glm::rotate(model, glm::radians(modelAngle), glm::vec3(0.0f, -1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.2f));
 
         modelLoadingShader.setMat4("model", model);
 
-        nanosuit.Draw(modelLoadingShader);
+        //nanosuit.Draw(modelLoadingShader);
+        sponza.Draw(modelLoadingShader);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(window);
