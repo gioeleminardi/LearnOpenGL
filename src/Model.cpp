@@ -60,8 +60,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
         // check if mesh has texture coordinates
         if (mesh->mTextureCoords[0]) {
-            vertex.texCoords.x = mesh->mTextureCoords[0].x;
-            vertex.texCoords.y = mesh->mTextureCoords[0].y;
+            vertex.texCoords.x = mesh->mTextureCoords[0][i].x;
+            vertex.texCoords.y = mesh->mTextureCoords[0][i].y;
         } else {
             vertex.texCoords = glm::vec2(0.0f, 0.0f);
         }
@@ -71,7 +71,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
     for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
         aiFace face = mesh->mFaces[i];
-        for (unsigned int j = 0; i < face.mNumIndices; ++j) {
+        for (unsigned int j = 0; j < face.mNumIndices; ++j) {
             indices.push_back(face.mIndices[j]);
         }
     }
