@@ -133,7 +133,7 @@ void main() {
         result += calculateSpotLight(sLights_[i], viewDirection, normal);
     }
 
-    if(texture(material.texture_diffuse1, TexCoords).a < 0.5f)
+    if(texture(material.texture_diffuse1, TexCoords).a < 0.1f)
     {
         discard;
     }
